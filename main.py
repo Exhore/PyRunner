@@ -2,22 +2,30 @@ import pygame
 from sys import exit
 
 pygame.init()
-screen = pygame.display.set_mode((800,400))
+screen    = pygame.display.set_mode((800,400))
 pygame.display.set_caption("EdgeRunner")
-clock = pygame.time.Clock()
+clock     = pygame.time.Clock()
 test_font = pygame.font.Font('font/Cyberfall.otf', 50)
 
 
-sky_surface = pygame.image.load('graphics/Sky.png').convert_alpha()
-ground_surface = pygame.image.load('graphics/ground.png').convert_alpha()
-text_surface = test_font.render("Runner", False, 'Black')
+# surfaces
+sky_surface     = pygame.image.load('graphics/Sky.png').convert()
+ground_surface  = pygame.image.load('graphics/ground.png').convert()
+score_surface   = test_font.render("My game", False, 'Black')
 
+#rects
+score_rect      = score_surface.get_rect(center = (400,50))
+
+#player
+player_surface = pygame.image.load('graphics/Player/player_walk_1.png').convert_alpha()
+player_rect    = player_surface.get_rect(midbottom = (80,300))
+
+#snail
 snail_surface = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
+snail_rect    = snail_surface.get_rect(bottomright = (600, 300))
 
-# positions
-snail_x_pos = 300
-snail_y_pos = 270
-
+# mouse pos
+mouse_pos = pygame.mouse.get_pos()
 
 while True:
     for event in pygame.event.get():
@@ -25,13 +33,27 @@ while True:
             pygame.quit()
             exit()
 
+    # mouse on player
+        # if event.type == pygame.MOUSEMOTION:
+        #     if player_rect.collidepoint(event.pos): print('collision')
+
+    #invocar
     screen.blit(sky_surface, (0,0))
     screen.blit(ground_surface, (0,300))
-    screen.blit(text_surface, (300, 50))
-    snail_x_pos -= 1
-    if snail_x_pos == -100:
-        snail_x_pos = 820
-    screen.blit(snail_surface, (snail_x_pos,snail_y_pos))
+    pygame.draw.rect(screen, 'Pink', score_rect)
+    screen.blit(score_surface, score_rect)
+    screen.blit(player_surface, player_rect)
+    screen.blit(snail_surface, snail_rect)
+    # snail action
+    snail_rect.x -= 3
+    if snail_rect.right == -120:
+        snail_rect.left = 800
+
+
+
+    if player_rect.collidepoint(mouse_pos):
+        print(pygame.mouse.get_pressed())
+
 
 
     pygame.display.update()
