@@ -97,18 +97,10 @@ while True:
 
         # mouse pos
         mouse_pos = pygame.mouse.get_pos()
-        # if player_rect.collidepoint(mouse_pos):
-        #     print('collision')
 
         #player gravity
         player_gravity += 1
         player_rect.y += player_gravity
-        # if player_rect.collidepoint(mouse_pos):
-        #     print(pygame.mouse.get_pressed())
-
-
-        # if keys[pygame.K_SPACE]:
-        #     print('saltar')
 
         #fit to ground
         if player_rect.bottom >= 300:
