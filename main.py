@@ -4,66 +4,90 @@ from sys import exit
 
 def display_score():
     current_time = int(pygame.time.get_ticks() / 1000) - start_time
-    score_surface = test_font.render(f'Score: {current_time}', False, (64,64,64))
-    score_rect = score_surface.get_rect(center = (400,50))
+    score_surface = texto_grande.render(
+        f'Score: {current_time}', False, (64, 64, 64))
+    score_rect = score_surface.get_rect(center=(400, 50))
     screen.blit(score_surface, score_rect)
-    print(current_time)
+    return current_time
 
 
 pygame.init()
-screen    = pygame.display.set_mode((800,400))
+# window res
+screen = pygame.display.set_mode((800, 400))
+#title of game
 pygame.display.set_caption("EdgeRunner")
-clock     = pygame.time.Clock()
-test_font = pygame.font.Font('font/Cyberfall.otf', 50)
+clock = pygame.time.Clock()
 
-#start time
+#text assign
+texto_grande = pygame.font.Font('font/Cyberfall.otf', 50)
+texto_mediano = pygame.font.Font('font/Cyberfall.otf', 20)
+texto_pequeno = pygame.font.Font('font/Cyberfall.otf', 15)
+
+# score init
+score = 0
+
+
+# start time
 start_time = 0
 
 # ground
-sky_surface     = pygame.image.load('graphics/Sky.png').convert()
-ground_surface  = pygame.image.load('graphics/ground.png').convert()
-
-# score
-# score_surface   = test_font.render("My game", False, (64,64,64))
-# score_rect      = score_surface.get_rect(center = (400,50))
+sky_surface = pygame.image.load('graphics/Sky.png').convert()
+ground_surface = pygame.image.load('graphics/ground.png').convert()
 
 
 # positions for reset
-player_pos = (80,300)
-snail_pos  = (600,300)
+player_pos = (80, 300)
+snail_pos = (600, 300)
 
 # player
 player_surface = pygame.image.load('graphics/Player/player_walk_1.png').convert_alpha()
-player_rect    = player_surface.get_rect(midbottom = player_pos)
+player_rect = player_surface.get_rect(midbottom=player_pos)
 player_gravity = 0
+
+
+# intro screen
+player_stand = pygame.image.load('graphics/Player/player_stand.png').convert_alpha()
+# 2x o rotozoom, rotozoom es el mejor, y puedo rotar donde el 0
+player_stand = pygame.transform.rotozoom(player_stand, 0, 2)
+player_stand_rect = player_stand.get_rect(center=(400, 200))
+
+#game name
+game_name = texto_grande.render('EdgeRunner', False, (111, 196, 169))
+game_name_rect = game_name.get_rect(center=(400, 60))
+
+#game message
+game_message = texto_mediano.render('Press SPACE to run', False, (111,196,169))
+game_message_rect = game_message.get_rect(center=(400,350))
+
 # snail
 snail_surface = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
-snail_rect    = snail_surface.get_rect(midbottom = snail_pos)
+snail_rect = snail_surface.get_rect(midbottom=snail_pos)
 
 # keys
 keys = pygame.key.get_pressed()
 
+# mouse pos
+mouse_pos = pygame.mouse.get_pos()
 
-#game active
 
-game_active = True
+# score message
+score_message = texto_pequeno.render(f'Tu score: {score}', False, "black")
+score_message_rect = score_message.get_rect(center=(700,20))
+
+
+# game active
+game_active = False
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-        # if event.type == pygame.MOUSEBUTTONUP:
-        #     print("MOUSE UP")
-        # if event.type == pygame.MOUSEMOTION:
-        #     print(event.pos)
-        # if event.type == pygame.KEYDOWN:
-        #     print('key down')
+
         if game_active:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and player_rect.bottom == 300:
                     player_gravity = -20
-
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if player_rect.collidepoint(event.pos):
@@ -74,50 +98,51 @@ while True:
                 game_active = True
                 start_time = int(pygame.time.get_ticks() / 1000)
 
-        # if event.type == pygame.MOUSEMOTION:
-        #     if player_rect.collidepoint(event.pos):
-        #         print("collision")
     if game_active:
-        #invocar
-        screen.blit(sky_surface, (0,0))
-        screen.blit(ground_surface, (0,300))
-        # pygame.draw.rect(screen, '#c0e8ec', score_rect)
-        # screen.blit(score_surface, score_rect)
+        # invocar
+        score = display_score()
+        screen.blit(sky_surface, (0, 0))
+        screen.blit(ground_surface, (0, 300))
         screen.blit(player_surface, player_rect)
         screen.blit(snail_surface, snail_rect)
-        
-        display_score()
-        
-        #draw a line
-        #pygame.draw.line(screen, 'black', (0, 0), (800,400))
-        # snail action
+
+        ############################### REAL TIME
         snail_rect.x -= 3
         if snail_rect.right == -120:
             snail_rect.left = 800
+            
+            
+            
+        
 
-        # mouse pos
-        mouse_pos = pygame.mouse.get_pos()
-
-        #player gravity
+        # player gravity
         player_gravity += 1
         player_rect.y += player_gravity
 
-        #fit to ground
+        # fit to ground
         if player_rect.bottom >= 300:
             player_rect.bottom = 300
 
-
-
-        #snail kill-collide-
+        # snail kill-collide-
         if snail_rect.colliderect(player_rect):
             game_active = False
-    else:
-        screen.fill('Black')
 
+        screen.blit(score_message, score_message_rect)
+        ###############################
+
+    else:
+        screen.fill((94, 129, 162))
+        screen.blit(player_stand, player_stand_rect)
+        screen.blit(game_name, game_name_rect)
+
+        #score message out of game
+        screen.blit(score_message, score_message_rect)
+
+        if score == 0:
+            screen.blit(game_message, game_message_rect)
+        else:
+            screen.blit(score_message, score_message_rect)
 
 
     pygame.display.update()
     clock.tick(60)
-
-
-
