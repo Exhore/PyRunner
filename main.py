@@ -4,12 +4,10 @@ from sys import exit
 
 def display_score():
     current_time = int(pygame.time.get_ticks() / 1000) - start_time
-    score_surface = texto_grande.render(
-        f'Score: {current_time}', False, (64, 64, 64))
-    score_rect = score_surface.get_rect(center=(400, 50))
+    score_surface = texto_pequeno.render(f'SCORE: {score}', False, "gold")
+    score_rect = score_surface.get_rect(center=(700,30))
     screen.blit(score_surface, score_rect)
     return current_time
-
 
 pygame.init()
 # window res
@@ -21,7 +19,7 @@ clock = pygame.time.Clock()
 #text assign
 texto_grande = pygame.font.Font('font/Cyberfall.otf', 50)
 texto_mediano = pygame.font.Font('font/Cyberfall.otf', 20)
-texto_pequeno = pygame.font.Font('font/Cyberfall.otf', 15)
+texto_pequeno = pygame.font.Font('font/Cyberfall.otf', 17)
 
 # score init
 score = 0
@@ -70,11 +68,6 @@ keys = pygame.key.get_pressed()
 mouse_pos = pygame.mouse.get_pos()
 
 
-# score message
-score_message = texto_pequeno.render(f'Tu score: {score}', False, "black")
-score_message_rect = score_message.get_rect(center=(700,20))
-
-
 # game active
 game_active = False
 
@@ -100,20 +93,19 @@ while True:
 
     if game_active:
         # invocar
-        score = display_score()
         screen.blit(sky_surface, (0, 0))
         screen.blit(ground_surface, (0, 300))
+        # cuidado con las capas
+        ############################### REAL TIME
+        score = display_score()
         screen.blit(player_surface, player_rect)
         screen.blit(snail_surface, snail_rect)
 
-        ############################### REAL TIME
-        snail_rect.x -= 3
+
+        snail_rect.x -= 4
         if snail_rect.right == -120:
             snail_rect.left = 800
-            
-            
-            
-        
+
 
         # player gravity
         player_gravity += 1
@@ -127,22 +119,20 @@ while True:
         if snail_rect.colliderect(player_rect):
             game_active = False
 
-        screen.blit(score_message, score_message_rect)
         ###############################
 
     else:
         screen.fill((94, 129, 162))
         screen.blit(player_stand, player_stand_rect)
-        screen.blit(game_name, game_name_rect)
 
         #score message out of game
-        screen.blit(score_message, score_message_rect)
+        score_message = texto_pequeno.render(f'Tu score: {score}', False, (111,196,169))
+        score_message_rect = score_message.get_rect(center=(400,330))
+        screen.blit(game_name, game_name_rect)
 
-        if score == 0:
-            screen.blit(game_message, game_message_rect)
-        else:
-            screen.blit(score_message, score_message_rect)
 
+        if score == 0: screen.blit(game_message, game_message_rect)
+        else: screen.blit(score_message, score_message_rect)
 
     pygame.display.update()
     clock.tick(60)
